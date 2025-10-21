@@ -11,16 +11,26 @@ import Foundation
 @main
 struct SawaedApp: App {
     private let baseURL = URL(string: "https://sawaed.tareq.pro")!
-    private let keychain = KeychainStore()
-    private lazy var tokenMediator = TokenMediator(keychain: keychain, baseURL: baseURL)
-    private lazy var httpClient = HTTPClient(baseURL: baseURL, tokenProvider: tokenMediator)
-    private lazy var authService = AuthService(http: httpClient, keychain: keychain)
+    @StateObject private var appContainer: AppContainer
     @StateObject private var appViewModel = AppViewModel()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(appViewModel)
+                .environmentObject(appContainer)
         }
+    }
+
+    init() {
+        let keychain = KeychainStore()
+        let defaults = UserDefaultsStore()
+        let tokenMediator = TokenMediator(keychain: keychain, baseURL: baseURL)
+        let httpClient = HTTPClient(baseURL: baseURL, tokenProvider: tokenMediator)
+        let authService = AuthService(http: httpClient, keychain: keychain)
+        let onboardingService = OnboardingService(http: httpClient)
+        let profileService = ProfileService(http: httpClient)
+        let container = AppContainer(keychain: keychain, defaults: defaults, http: httpClient, auth: authService, onboarding: onboardingService, profile: profileService)
+        _appContainer = StateObject(wrappedValue: container)
     }
 }
