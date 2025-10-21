@@ -1,0 +1,44 @@
+{
+  "fill" : {
+    "automatic-gradient" : "display-p3:0.96613,0.96783,0.96722,1.00000"
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "blend-mode" : "normal",
+          "fill" : {
+            "linear-gradient" : [
+              "display-p3:0.39961,0.48688,0.81121,1.00000",
+              "display-p3:0.48062,0.18064,0.71843,1.00000"
+            ]
+          },
+          "glass" : false,
+          "image-name" : "Logo2.svg",
+          "name" : "Logo2",
+          "position" : {
+            "scale" : 2,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}
