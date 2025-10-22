@@ -1,13 +1,23 @@
 import SwiftUI
+import Combine
+
+enum AuthFlow {
+    case signIn
+    case signUp
+}
 
 struct VerifyOtpView: View {
     let email: String
+    let flow: AuthFlow
+    let password: String?
     @State private var code: String = ""
     @State private var isLoading: Bool = false
     @State private var isResending: Bool = false
+    @State private var cooldownRemaining: Int = 0
     @State private var errorMessage: LocalizedStringKey?
     @EnvironmentObject var appVM: AppViewModel
     @EnvironmentObject var container: AppContainer
+    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
         ZStack {
@@ -39,11 +49,15 @@ struct VerifyOtpView: View {
                         )
                         HStack {
                             Button(action: { resend() }) {
-                                Text(isResending ? LocalizedStringKey("Sending…") : LocalizedStringKey("Resend code"))
+                                if cooldownRemaining > 0 {
+                                    Text(String(format: NSLocalizedString("Resend in %@", comment: "resend countdown"), formatTime(cooldownRemaining)))
+                                } else {
+                                    Text(isResending ? LocalizedStringKey("Sending…") : LocalizedStringKey("Resend code"))
+                                }
                             }
                             .buttonStyle(.plain)
                             .tint(.secondary)
-                            .disabled(isResending)
+                            .disabled(isResending || cooldownRemaining > 0)
                             Spacer()
                         }
                         PrimaryButton(title: "Verify", isLoading: isLoading, isDisabled: !canSubmit) {
@@ -60,6 +74,9 @@ struct VerifyOtpView: View {
                 }
             }
         }
+        .onReceive(timer) { _ in
+            if cooldownRemaining > 0 { cooldownRemaining -= 1 }
+        }
     }
 
     private func verify() {
@@ -69,7 +86,7 @@ struct VerifyOtpView: View {
             do {
                 try await container.auth.verifyOtp(email: email, code: code)
                 let status = try await container.onboarding.status()
-                if status.status.uppercased() == "COMPLETED" {
+                if status.completed {
                     appVM.authState = .signedIn
                 } else {
                     appVM.authState = .onboarding
@@ -87,6 +104,7 @@ struct VerifyOtpView: View {
         Task {
             do {
                 try await container.auth.requestOtp(email: email)
+                cooldownRemaining = 120
             } catch {
                 errorMessage = "Failed to resend code"
             }
@@ -95,12 +113,19 @@ struct VerifyOtpView: View {
     }
     
     private var canSubmit: Bool {
-        code.trimmingCharacters(in: .whitespaces).count >= 4
+        let trimmed = code.trimmingCharacters(in: .whitespaces)
+        return trimmed.range(of: "^\\d{6}$", options: .regularExpression) != nil
     }
 
     private var codeError: LocalizedStringKey? {
         if code.isEmpty { return nil }
-        return canSubmit ? nil : "Code should be at least 4 digits"
+        return canSubmit ? nil : "Code must be 6 digits"
+    }
+
+    private func formatTime(_ seconds: Int) -> String {
+        let m = seconds / 60
+        let s = seconds % 60
+        return String(format: "%d:%02d", m, s)
     }
 }
 

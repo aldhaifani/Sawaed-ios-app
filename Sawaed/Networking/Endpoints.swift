@@ -5,6 +5,8 @@ enum Endpoints {
     static func authVerifyOtp() -> String { "/api/mobile/auth/verify-otp" }
     static func authRefresh() -> String { "/api/mobile/auth/refresh" }
     static func authSignout() -> String { "/api/mobile/auth/signout" }
+    static func authSignin() -> String { "/api/mobile/auth/signin" }
+    static func authSignup() -> String { "/api/mobile/auth/signup" }
 
     static func onboardingStatus() -> String { "/api/mobile/v1/onboarding/status" }
     static func onboardingDraft() -> String { "/api/mobile/v1/onboarding/draft" }

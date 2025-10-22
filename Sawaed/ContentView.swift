@@ -55,7 +55,7 @@ private extension ContentView {
             Task { @MainActor in
                 do {
                     let status = try await appContainer.onboarding.status()
-                    if status.status.uppercased() == "COMPLETED" {
+                    if status.completed {
                         appVM.authState = .signedIn
                     } else {
                         appVM.authState = .onboarding

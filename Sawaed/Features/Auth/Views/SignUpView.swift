@@ -79,7 +79,7 @@ struct SignUpView: View {
                 }
             }
         }
-        .sheet(isPresented: $isPushingVerify) { VerifyOtpView(email: email) }
+        .sheet(isPresented: $isPushingVerify) { VerifyOtpView(email: email, flow: .signUp, password: password) }
     }
 
     private var header: some View {
@@ -120,11 +120,19 @@ struct SignUpView: View {
         errorMessage = nil
         Task {
             do {
-                // Until a dedicated sign-up endpoint exists, use OTP request to verify email
+                try await container.auth.signUp(email: email, password: password)
                 try await container.auth.requestOtp(email: email)
                 isPushingVerify = true
             } catch {
-                errorMessage = "Failed to sign up"
+                if case let AuthService.AuthError.server(code, _) = error {
+                    if code == "email_already_exists" {
+                        errorMessage = "Email already exists"
+                    } else {
+                        errorMessage = "Failed to sign up"
+                    }
+                } else {
+                    errorMessage = "Failed to sign up"
+                }
             }
             isLoading = false
         }

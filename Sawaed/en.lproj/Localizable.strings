@@ -1,3 +1,5 @@
+"Failed to create account" = "Failed to create account";
+"Missing password" = "Missing password";
 "Email" = "Email";
 "you@example.com" = "you@example.com";
 "Password" = "Password";
@@ -10,6 +12,7 @@
 "Please enter a valid email address" = "Please enter a valid email address";
 "Password must be at least 6 characters" = "Password must be at least 6 characters";
 "Failed to sign in" = "Failed to sign in";
+"Invalid email or password" = "Invalid email or password";
 "Create your account" = "Create your account";
 "Join Sawaed with your email and password" = "Join Sawaed with your email and password";
 "Confirm Password" = "Confirm Password";
@@ -18,15 +21,17 @@
 "Create account" = "Create account";
 "Passwords do not match" = "Passwords do not match";
 "Failed to sign up" = "Failed to sign up";
+"Email already exists" = "Email already exists";
 "Verify code" = "Verify code";
 "Enter the code we sent to %@" = "Enter the code we sent to %@";
 "Code" = "Code";
 "000000" = "000000";
 "Sending…" = "Sending…";
 "Resend code" = "Resend code";
+"Resend in %@" = "Resend in %@";
 "Verify" = "Verify";
 "Invalid code" = "Invalid code";
 "Failed to resend code" = "Failed to resend code";
-"Code should be at least 4 digits" = "Code should be at least 4 digits";
+"Code must be 6 digits" = "Code must be 6 digits";
 "Create a password" = "Create a password";
 "Re-enter your password" = "Re-enter your password";

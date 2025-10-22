@@ -45,7 +45,28 @@ struct SignInView: View {
                     onSubmit: { signIn() }
                 )
                 HStack {
-                    Button("Forgot password?") {}
+                    Button("Forgot password?") {
+                        errorMessage = nil
+                        guard isValidEmail(email) else {
+                            errorMessage = "Please enter a valid email address"
+                            return
+                        }
+                        isLoading = true
+                        Task {
+                            do {
+                                try await container.auth.requestOtp(email: email)
+                                await MainActor.run {
+                                    isPushingVerify = true
+                                    isLoading = false
+                                }
+                            } catch {
+                                await MainActor.run {
+                                    errorMessage = "Failed to send reset code"
+                                    isLoading = false
+                                }
+                            }
+                        }
+                    }
                         .buttonStyle(.plain)
                         .tint(.secondary)
                     Spacer()
@@ -56,9 +77,7 @@ struct SignInView: View {
             }
             Spacer()
             Group {
-                PrimaryButton(title: "Sign in", isLoading: isLoading, isDisabled: !canSubmit) {
-                    signIn()
-                }
+                PrimaryButton(title: "Sign in", isLoading: isLoading, isDisabled: !canSubmit) { signIn() }
                 if let errorMessage {
                     Text(errorMessage)
                         .foregroundColor(.red)
@@ -66,7 +85,9 @@ struct SignInView: View {
                 }
             }
         }
-        .sheet(isPresented: $isPushingVerify) { VerifyOtpView(email: email) }
+        .sheet(isPresented: $isPushingVerify) { VerifyOtpView(email: email, flow: .signIn, password: nil) }
+        .onChange(of: email) { _ in errorMessage = nil }
+        .onChange(of: password) { _ in errorMessage = nil }
     }
 
     private var header: some View {
@@ -87,13 +108,10 @@ struct SignInView: View {
         return isValidEmail(email) ? nil : "Please enter a valid email address"
     }
 
-    private var passwordError: LocalizedStringKey? {
-        if password.isEmpty { return nil }
-        return password.count >= 6 ? nil : "Password must be at least 6 characters"
-    }
+    private var passwordError: LocalizedStringKey? { return nil }
 
     private var canSubmit: Bool {
-        isValidEmail(email) && password.count >= 6
+        isValidEmail(email) && !password.isEmpty
     }
 
     private func signIn() {
@@ -102,13 +120,47 @@ struct SignInView: View {
         errorMessage = nil
         Task {
             do {
-                // For now use OTP flow until password sign-in endpoint exists
-                try await container.auth.requestOtp(email: email)
-                isPushingVerify = true
+                try await container.auth.signIn(email: email, password: password)
             } catch {
-                errorMessage = "Failed to sign in"
+                if case let AuthService.AuthError.server(code, _) = error, code == "unverified" {
+                    do {
+                        try await container.auth.requestOtp(email: email)
+                        await MainActor.run {
+                            isPushingVerify = true
+                            isLoading = false
+                        }
+                    } catch {
+                        await MainActor.run {
+                            errorMessage = "Failed to resend verification code"
+                            isLoading = false
+                        }
+                    }
+                } else {
+                    await MainActor.run {
+                        errorMessage = "Invalid email or password"
+                        isLoading = false
+                    }
+                }
+                return
             }
-            isLoading = false
+            do {
+                let status = try await container.onboarding.status()
+                await MainActor.run {
+                    errorMessage = nil
+                    if status.completed {
+                        appVM.authState = .signedIn
+                    } else {
+                        appVM.authState = .onboarding
+                    }
+                    isLoading = false
+                }
+            } catch {
+                await MainActor.run {
+                    errorMessage = nil
+                    appVM.authState = .onboarding
+                    isLoading = false
+                }
+            }
         }
     }
 

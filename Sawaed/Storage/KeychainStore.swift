@@ -15,6 +15,11 @@ final class KeychainStore {
 
     func refreshToken() -> String? { read(key: accountRefresh) }
 
+    func clearTokens() {
+        _ = delete(key: accountAccess)
+        _ = delete(key: accountRefresh)
+    }
+
     private func save(key: String, value: String) -> Bool {
         guard let data = value.data(using: .utf8) else { return false }
         let query: [String: Any] = [
@@ -40,5 +45,15 @@ final class KeychainStore {
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         guard status == errSecSuccess, let data = item as? Data else { return nil }
         return String(data: data, encoding: .utf8)
+    }
+
+    private func delete(key: String) -> Bool {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key
+        ]
+        let status = SecItemDelete(query as CFDictionary)
+        return status == errSecSuccess || status == errSecItemNotFound
     }
 }

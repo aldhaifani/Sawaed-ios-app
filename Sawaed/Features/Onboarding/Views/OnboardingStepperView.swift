@@ -62,5 +62,24 @@ struct OnboardingStepperView: View {
         }
         .padding()
         .navigationTitle("Onboarding")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Sign out") { signOut() }
+            }
+        }
+    }
+}
+
+private extension OnboardingStepperView {
+    func signOut() {
+        Task { @MainActor in
+            do {
+                try await container.auth.signout()
+            } catch {
+                // ignore server errors on sign out
+            }
+            container.keychain.clearTokens()
+            appVM.authState = .signedOut
+        }
     }
 }

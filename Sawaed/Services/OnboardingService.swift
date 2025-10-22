@@ -2,7 +2,7 @@ import Foundation
 
 struct RegionDTO: Codable, Sendable { let id: String; let name: String }
 struct CityDTO: Codable, Sendable { let id: String; let name: String }
-struct OnboardingStatusDTO: Codable, Sendable { let status: String }
+struct OnboardingStatusDTO: Codable, Sendable { let completed: Bool; let currentStep: String? }
 
 final class OnboardingService {
     private let http: HTTPClient

@@ -1,3 +1,5 @@
+"Failed to create account" = "فشل إنشاء الحساب";
+"Missing password" = "كلمة المرور مفقودة";
 "Email" = "البريد الإلكتروني";
 "you@example.com" = "you@example.com";
 "Password" = "كلمة المرور";
@@ -10,6 +12,7 @@
 "Please enter a valid email address" = "يرجى إدخال بريد إلكتروني صحيح";
 "Password must be at least 6 characters" = "يجب أن تكون كلمة المرور 6 أحرف على الأقل";
 "Failed to sign in" = "فشل تسجيل الدخول";
+"Invalid email or password" = "بريد إلكتروني أو كلمة مرور غير صحيحة";
 "Create your account" = "أنشئ حسابك";
 "Join Sawaed with your email and password" = "انضم إلى سواعد باستخدام بريدك الإلكتروني وكلمة المرور";
 "Confirm Password" = "تأكيد كلمة المرور";
@@ -18,15 +21,17 @@
 "Create account" = "إنشاء حساب";
 "Passwords do not match" = "كلمتا المرور غير متطابقتين";
 "Failed to sign up" = "فشل إنشاء الحساب";
+"Email already exists" = "البريد الإلكتروني مستخدم بالفعل";
 "Verify code" = "تأكيد الرمز";
 "Enter the code we sent to %@" = "أدخل الرمز الذي أرسلناه إلى %@";
 "Code" = "الرمز";
 "000000" = "٠٠٠٠٠٠";
 "Sending…" = "جارٍ الإرسال…";
 "Resend code" = "إعادة إرسال الرمز";
+"Resend in %@" = "إعادة الإرسال خلال %@";
 "Verify" = "تأكيد";
 "Invalid code" = "رمز غير صحيح";
 "Failed to resend code" = "فشل في إعادة إرسال الرمز";
-"Code should be at least 4 digits" = "يجب أن يتكون الرمز من 4 أرقام على الأقل";
+"Code must be 6 digits" = "يجب أن يتكون الرمز من 6 أرقام";
 "Create a password" = "أنشئ كلمة مرور";
 "Re-enter your password" = "أعد إدخال كلمة المرور";
